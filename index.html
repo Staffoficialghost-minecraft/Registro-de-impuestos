@@ -70,8 +70,12 @@ body { background: #050811; color: #dbe9ff; }
     <div id="dash-layout" class="hidden">
         <aside>
             <h3>Panel</h3>
-            <p id="user-info-display"></p>
-            <nav id="dash-nav">
+            <p id="user-info-display"></p>            <div class="card" style="margin-bottom:8px; background: rgba(12, 21, 37,0.85); border:1px solid rgba(93,129,197,0.5);">
+                <h4 style="margin-top:0; color: #b8d2ff;">Invitaciones</h4>
+                <p style="margin:6px 0;"><strong>Código:</strong> <span id="invite-code">-</span></p>
+                <button type="button" onclick="copyInviteCode()">Copiar enlace</button>
+                <button type="button" onclick="regenerateInviteCode()" class="secondary" style="margin-top:6px;">Regenerar código</button>
+            </div>            <nav id="dash-nav">
                 <button type="button" onclick="showPanel('p-taxes')">Impuestos</button>
                 <button type="button" onclick="showPanel('p-users')">Usuarios</button>
                 <button type="button" onclick="showPanel('p-ranks')">Rangos</button>
