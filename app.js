@@ -145,23 +145,66 @@ window.renderRanks = () => {
   const canEditRanks = hasPerm('cambiar_rangos');
   (state.ranks||[]).sort((a,b)=>a.order - b.order).forEach(r=>{
     const tr = document.createElement('tr');
-    const currentPerms = new Set(r.permissions || []);
-    const options = ALL_PERMS.map(p => `
-      <option value="${p}" ${currentPerms.has(p) ? 'selected' : ''}>${p}</option>
-    `).join('');
-
     tr.innerHTML = `
       <td>${r.name}</td>
-      <td><input type="number" min="0" max="100" id="rank-tax-${r.id}" value="${r.taxPercent || 0}" style="width:80px" ${canEditRanks ? '' : 'disabled'} /></td>
-      <td>
-        <select id="rank-perm-${r.id}" multiple size="4" style="width:220px;" ${canEditRanks ? '' : 'disabled'}>
-          ${options}
-        </select>
-      </td>
-      <td><button onclick="saveRank('${r.id}')" ${canEditRanks ? '' : 'disabled'}>${canEditRanks ? 'Guardar' : 'No permitido'}</button></td>
+      <td>${r.taxPercent}%</td>
+      <td><button onclick="selectRank('${r.id}')" ${canEditRanks ? '' : 'disabled'}>Editar</button></td>
     `;
     tbody.appendChild(tr);
   });
+
+  const rankEditPanel = document.getElementById('rank-edit-panel');
+  if(rankEditPanel) rankEditPanel.style.display = 'none';
+};
+
+window.selectRank = rankId => {
+  const r = state.ranks.find(x => x.id === rankId);
+  if(!r) return;
+  state.selectedRank = r;
+  renderSelectedRank();
+};
+
+window.closeRankEditor = () => {
+  state.selectedRank = null;
+  const panel = document.getElementById('rank-edit-panel');
+  if(panel) panel.style.display = 'none';
+};
+
+window.renderSelectedRank = () => {
+  const r = state.selectedRank;
+  if(!r) return;
+  const panel = document.getElementById('rank-edit-panel');
+  if(!panel) return;
+
+  document.getElementById('edit-rank-title').innerText = `Editar rango: ${r.name}`;
+  document.getElementById('edit-rank-name').innerText = r.name;
+  document.getElementById('edit-rank-tax').value = r.taxPercent ?? 0;
+
+  const permContainer = document.getElementById('edit-rank-perms-list');
+  permContainer.innerHTML = '';
+  ALL_PERMS.forEach(p => {
+    const checked = (r.permissions||[]).includes(p);
+    const id = `perm-checkbox-${p}`;
+    permContainer.innerHTML += `
+      <label style="display:flex; align-items:center; gap:6px; font-size:13px; color:#e4edff;">
+        <input type="checkbox" id="${id}" value="${p}" ${checked ? 'checked' : ''} />
+        ${p}
+      </label>
+    `;
+  });
+
+  panel.style.display = 'block';
+};
+
+window.saveSelectedRank = async () => {
+  if(!state.selectedRank) return;
+  const rankId = state.selectedRank.id;
+  const tax = parseFloat(document.getElementById('edit-rank-tax').value) || 0;
+  const perms = ALL_PERMS.filter(p => document.getElementById(`perm-checkbox-${p}`)?.checked);
+
+  await updateDoc(doc(db,'ranks',rankId), { taxPercent: tax, permissions: perms });
+  toast('Rango guardado');
+  await loadDashboardData();
 };
 
 window.loadDashboardData = async () => {
