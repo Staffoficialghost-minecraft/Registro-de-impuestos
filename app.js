@@ -143,6 +143,29 @@ window.logout = () => signOut(auth);
 // ==========================
 // Manejo de estado auth
 // ==========================
+const updateDashboardUI = () => {
+  const unverifiedDiv = document.getElementById('unverified-msg');
+  const dashLayout = document.getElementById('dash-layout');
+  const infoDisplay = document.getElementById('user-info-display');
+
+  if(!state.dbUser){
+    unverifiedDiv?.classList.add('hidden');
+    dashLayout?.classList.add('hidden');
+    return;
+  }
+
+  if(state.dbUser.verified){
+    unverifiedDiv?.classList.add('hidden');
+    dashLayout?.classList.remove('hidden');
+    infoDisplay && (infoDisplay.innerText = `Nametag: ${state.dbUser.nametag || ''} - Clan: ${state.dbUser.clanId || ''}`);
+    showPanel('p-taxes');
+  } else {
+    unverifiedDiv?.classList.remove('hidden');
+    dashLayout?.classList.add('hidden');
+    infoDisplay && (infoDisplay.innerText = `Nametag: ${state.dbUser.nametag || ''} - Clan: ${state.dbUser.clanId || ''}`);
+  }
+};
+
 onAuthStateChanged(auth, async u => {
   if(!u){ state.authUser=null; state.dbUser=null; return nav('v-home'); }
   state.authUser = u;
@@ -151,6 +174,7 @@ onAuthStateChanged(auth, async u => {
     if(!userSnap.exists()) return logout();
     state.dbUser = userSnap.data();
     nav('v-dashboard');
+    updateDashboardUI();
   } catch(e){
     console.error(e);
     logout();
