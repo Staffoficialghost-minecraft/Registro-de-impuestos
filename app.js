@@ -119,6 +119,12 @@ window.renderUsers = () => {
       `;
     }
 
+    const canEditMoney = hasPerm('editar_dinero');
+    const moneyValue = Number(u.money ?? 1000).toFixed(2);
+    const moneyCell = canEditMoney
+      ? `<div style="display:flex; gap:4px; align-items:center;"><input id="money-input-${u.id}" type="number" min="0" step="0.01" value="${moneyValue}" style="width:80px;" /><button onclick="saveUserMoney('${u.id}')" style="padding:2px 8px;">Guardar</button></div>`
+      : `$${moneyValue}`;
+
     const verifiedAction = hasPerm('verificar_cuentas') && !u.verified
       ? `<button onclick="toggleUserVerification('${u.id}', ${u.verified})">Verificar</button>`
       : '-';
@@ -127,6 +133,7 @@ window.renderUsers = () => {
     tr.innerHTML = `
       <td>${u.nametag || '(sin nametag)'}</td>
       <td>${rankCell}</td>
+      <td>${moneyCell}</td>
       <td>${u.verified ? 'Verificado' : 'Pendiente'}</td>
       <td>${verifiedAction}</td>
     `;
@@ -317,6 +324,18 @@ window.assignRankToUser = async userId => {
 
   await updateDoc(doc(db,'users',userId), { rankId: newRankId });
   toast('Rango asignado');
+  await loadDashboardData();
+};
+
+window.saveUserMoney = async userId => {
+  if(!hasPerm('editar_dinero')) return toast('Sin permisos para editar dinero', 'error');
+  const input = document.getElementById(`money-input-${userId}`);
+  if(!input) return toast('Campo de dinero no encontrado', 'error');
+  const value = parseFloat(input.value);
+  if(Number.isNaN(value) || value < 0) return toast('Monto inválido', 'error');
+
+  await updateDoc(doc(db,'users',userId), { money: value });
+  toast('Dinero actualizado');
   await loadDashboardData();
 };
 
