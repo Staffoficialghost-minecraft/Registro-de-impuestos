@@ -124,11 +124,23 @@ body { background: #050811; color: #dbe9ff; }
 
             <div id="p-ranks" class="panel hidden">
                 <h2>Gestión de Rangos</h2>
-                <div class="card" style="margin-bottom: 16px; background:#f8fafc; border:1px solid #d1d5db; text-align:left;">
+                <div class="card" style="margin-bottom: 16px; background: rgba(16, 27, 43, 0.93); border: 1px solid rgba(90, 126, 209, 0.42); text-align:left;">
                     <h3 style="margin: 8px 0; font-size: 16px;">Agregar Rango</h3>
                     <input type="text" id="new-rank-name" placeholder="Nombre de rango" style="width: 100%; margin-bottom: 8px;" />
                     <input type="number" id="new-rank-tax" placeholder="Impuesto %" min="0" max="100" style="width: 100%; margin-bottom: 8px;" />
-                    <input type="text" id="new-rank-perms" placeholder="Permisos (coma separados)" style="width: 100%; margin-bottom: 8px;" />
+                    <select id="new-rank-perms" multiple size="5" style="width: 100%; margin-bottom: 8px;">
+                        <option value="ver_tabla_impuestos">ver_tabla_impuestos</option>
+                        <option value="editar_tabla">editar_tabla</option>
+                        <option value="editar_dinero">editar_dinero</option>
+                        <option value="ver_jugadores">ver_jugadores</option>
+                        <option value="verificar_cuentas">verificar_cuentas</option>
+                        <option value="cambiar_rangos">cambiar_rangos</option>
+                        <option value="marcar_pago">marcar_pago</option>
+                        <option value="agregar_notas">agregar_notas</option>
+                        <option value="responder_mensajes">responder_mensajes</option>
+                        <option value="cerrar_semana">cerrar_semana</option>
+                        <option value="gestionar_rangos">gestionar_rangos</option>
+                    </select>
                     <button type="button" onclick="addRank()">Agregar rango</button>
                 </div>
                 <div class="table-container">
