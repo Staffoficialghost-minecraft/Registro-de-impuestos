@@ -246,6 +246,11 @@ window.loadDashboardData = async () => {
     const clanName = state.clan?.name || 'Clan desconocido';
     infoDisplay.innerText = `Nombre: ${state.dbUser.nametag || ''} | Clan: ${clanName}`;
   }
+
+  const inviteCode = document.getElementById('invite-code');
+  if(inviteCode){
+    inviteCode.innerText = state.clan?.inviteId || 'sin código';
+  }
 };
 
 window.toggleUserVerification = async (userId, verified) => {
@@ -300,6 +305,30 @@ window.closeWeek = async () => {
 
   state.currentWeek = { id:newWeekRef.id, clanId:state.dbUser.clanId, weekId:nextWeekId, closed:false, payments:{} };
   await loadDashboardData();
+};
+
+const generateInviteId = () => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for(let i=0; i<8; i++) code += chars[Math.floor(Math.random()*chars.length)];
+  return code;
+};
+
+window.copyInviteCode = () => {
+  const code = state.clan?.inviteId;
+  if(!code) return toast('No hay código de invitación', 'error');
+  navigator.clipboard.writeText(code).then(() => toast('Código copiado al portapapeles')).catch(()=>toast('No se pudo copiar', 'error'));
+};
+
+window.regenerateInviteCode = async () => {
+  if(!hasPerm('cambiar_rangos') && !hasPerm('gestionar_rangos')) return toast('Sin permisos', 'error');
+  if(!state.clan) return toast('No hay clan cargado', 'error');
+
+  const newCode = generateInviteId();
+  await updateDoc(doc(db,'clans',state.clan.id), { inviteId: newCode });
+  state.clan.inviteId = newCode;
+  document.getElementById('invite-code').innerText = newCode;
+  toast('Código regenerado');
 };
 
 window.saveRank = async rankId => {
