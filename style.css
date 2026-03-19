@@ -132,6 +132,38 @@ aside h3 {
     color: #d6e6ff;
 }
 
+#dash-nav button {
+    background: rgba(79, 109, 188, 0.2);
+    color: #dbe9ff;
+    border: 1px solid rgba(106, 136, 206, 0.5);
+    border-radius: 6px;
+    padding: 8px;
+}
+
+#dash-nav button:hover {
+    background: rgba(75, 104, 194, 0.35);
+}
+
+#dash-nav button.active {
+    background: rgba(118, 158, 255, 0.35);
+    color: #f6f9ff;
+    border-color: rgba(156, 186, 255, 0.7);
+}
+
+main .panel {
+    background: rgba(12, 21, 37, 0.92);
+    border: 1px solid rgba(93, 129, 197, 0.4);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.toast {
+    background: rgba(12, 25, 47, 0.95);
+    color: #e6efff;
+    border-left-color: #4f8cff;
+}
+
 aside nav button {
     display: block;
     margin-bottom: 10px;
