@@ -125,9 +125,14 @@ window.renderUsers = () => {
       ? `<div style="display:flex; gap:4px; align-items:center;"><input id="money-input-${u.id}" type="number" min="0" step="0.01" value="${moneyValue}" style="width:80px;" /><button onclick="saveUserMoney('${u.id}')" style="padding:2px 8px;">Guardar</button></div>`
       : `$${moneyValue}`;
 
-    const verifiedAction = hasPerm('verificar_cuentas') && !u.verified
+    const verifyButton = hasPerm('verificar_cuentas') && !u.verified
       ? `<button onclick="toggleUserVerification('${u.id}', ${u.verified})">Verificar</button>`
-      : '-';
+      : '';
+    const canExpel = hasPerm('gestionar_rangos');
+    const expelButton = canExpel && u.id !== state.dbUser?.uid
+      ? `<button onclick="expelUser('${u.id}')" style="background:#c33;color:#fff;">Expulsar</button>`
+      : '';
+    const actions = [verifyButton, expelButton].filter(Boolean).join(' ');
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -135,7 +140,7 @@ window.renderUsers = () => {
       <td>${rankCell}</td>
       <td>${moneyCell}</td>
       <td>${u.verified ? 'Verificado' : 'Pendiente'}</td>
-      <td>${verifiedAction}</td>
+      <td>${actions || '-'}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -336,6 +341,21 @@ window.saveUserMoney = async userId => {
 
   await updateDoc(doc(db,'users',userId), { money: value });
   toast('Dinero actualizado');
+  await loadDashboardData();
+};
+
+window.expelUser = async userId => {
+  if(!hasPerm('gestionar_rangos')) return toast('Sin permisos para expulsar usuarios', 'error');
+  if(userId === state.dbUser?.uid) return toast('No puedes expulsarte a ti mismo', 'error');
+  const user = state.users.find(u => u.id === userId);
+  if(!user) return toast('Usuario no encontrado', 'error');
+
+  if(!confirm(`¿Seguro que quieres expulsar a ${user.nametag || 'este usuario'} del clan?`)) {
+    return toast('Expulsión cancelada', 'error');
+  }
+
+  await updateDoc(doc(db,'users',userId), { clanId: null, rankId: null, verified: false });
+  toast('Usuario expulsado');
   await loadDashboardData();
 };
 
