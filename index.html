@@ -143,18 +143,28 @@ body { background: #050811; color: #dbe9ff; }
                     </select>
                     <button type="button" onclick="addRank()">Agregar rango</button>
                 </div>
+
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
                                 <th>Nombre</th>
                                 <th>Impuesto %</th>
-                                <th>Permisos</th>
                                 <th>Acción</th>
                             </tr>
                         </thead>
                         <tbody id="tbody-ranks"></tbody>
                     </table>
+                </div>
+
+                <div id="rank-edit-panel" class="card" style="margin-top: 16px; display:none;">
+                    <h3 style="margin: 8px 0; font-size: 16px;" id="edit-rank-title">Editar rango</h3>
+                    <div style="margin-bottom: 8px;">Nombre: <span id="edit-rank-name"></span></div>
+                    <div style="margin-bottom: 8px;">Impuesto: <input type="number" id="edit-rank-tax" min="0" max="100" style="width:80px" /></div>
+                    <div style="margin-bottom: 8px;">Permisos:</div>
+                    <div id="edit-rank-perms-list" style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:4px; margin-bottom:12px;"></div>
+                    <button type="button" onclick="saveSelectedRank()">Guardar rango</button>
+                    <button type="button" onclick="closeRankEditor()" class="secondary" style="margin-left:8px;">Cerrar</button>
                 </div>
             </div>
 
