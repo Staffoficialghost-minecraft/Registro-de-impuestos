@@ -450,10 +450,12 @@ const updateDashboardUI = () => {
   const unverifiedDiv = document.getElementById('unverified-msg');
   const dashLayout = document.getElementById('dash-layout');
   const infoDisplay = document.getElementById('user-info-display');
+  const inviteCode = document.getElementById('invite-code');
 
   if(!state.dbUser){
     unverifiedDiv?.classList.add('hidden');
     dashLayout?.classList.add('hidden');
+    if(inviteCode) inviteCode.innerText = '-';
     return;
   }
 
@@ -468,6 +470,10 @@ const updateDashboardUI = () => {
     dashLayout?.classList.add('hidden');
     infoDisplay && (infoDisplay.innerText = `Nametag: ${state.dbUser.nametag || ''} - Clan: ${clanName}`);
   }
+
+  if(inviteCode){
+    inviteCode.innerText = state.clan?.inviteId || (state.dbUser?.clanId ? 'Cargando...' : '-');
+  }
 };
 
 onAuthStateChanged(auth, async u => {
@@ -478,9 +484,7 @@ onAuthStateChanged(auth, async u => {
     if(!userSnap.exists()) return logout();
     state.dbUser = userSnap.data();
     nav('v-dashboard');
-    if(state.dbUser.verified){
-      await loadDashboardData();
-    }
+    await loadDashboardData();
     updateDashboardUI();
   } catch(e){
     console.error(e);
