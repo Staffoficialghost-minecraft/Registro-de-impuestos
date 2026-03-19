@@ -9,57 +9,72 @@
 /* Estilos generales       */
 /* ======================= */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Poppins', Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background: #f0f2f5;
+    background: radial-gradient(circle at top, #0e1a2a 0%, #03070f 54%, #02030a 100%);
+    color: #e7edf5;
     display: flex;
     justify-content: center;
     min-height: 100vh;
+    background-attachment: fixed;
+    overflow-x: hidden;
 }
 .view {
     display: none;
     width: 100%;
-    max-width: 480px;
+    max-width: 540px;
     padding: 20px;
     box-sizing: border-box;
 }
 .view:not(.hidden) { display: block; }
 .card {
-    background: #fff;
+    background: rgba(12, 21, 36, 0.92);
+    border: 1px solid rgba(101, 128, 255, 0.35);
     padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
     margin-bottom: 20px;
 }
 .card h1, .card h2 {
     margin-top: 0;
     margin-bottom: 16px;
     text-align: center;
+    color: #d6e6ff;
+    text-shadow: 0 0 14px rgba(110, 146, 255, 0.4);
 }
 input[type="text"], input[type="password"], input[type="number"] {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     margin-bottom: 12px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
+    border-radius: 8px;
+    border: 1px solid rgba(125, 146, 185, 0.7);
+    background: rgba(8, 17, 34, 0.8);
+    color: #e6efff;
     box-sizing: border-box;
+}
+input::placeholder {
+    color: #a4b4d7;
 }
 button {
     width: 100%;
-    padding: 10px;
+    padding: 11px;
     margin-top: 8px;
     border: none;
-    border-radius: 6px;
-    background-color: #007bff;
-    color: white;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #4f46e5, #6a7cfd);
+    color: #fff;
     font-size: 16px;
     cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+button:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
 }
 button.secondary {
-    background-color: #6c757d;
+    background: linear-gradient(135deg, rgba(100, 116, 139, 0.7), rgba(58, 65, 82, 0.7));
 }
-button:hover { opacity: 0.9; }
 .hidden { display: none; }
 
 /* ======================= */
@@ -187,6 +202,10 @@ th, td {
         <main>
             <div id="p-taxes" class="panel hidden">
                 <h2>Tabla de Impuestos</h2>
+                <div style="margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                    <span id="week-status">Semana: n/a</span>
+                    <button type="button" onclick="closeWeek()">Cerrar semana</button>
+                </div>
                 <div class="table-container">
                     <table>
                         <thead>
@@ -225,6 +244,13 @@ th, td {
 
             <div id="p-ranks" class="panel hidden">
                 <h2>Gestión de Rangos</h2>
+                <div class="card" style="margin-bottom: 16px; background:#f8fafc; border:1px solid #d1d5db; text-align:left;">
+                    <h3 style="margin: 8px 0; font-size: 16px;">Agregar Rango</h3>
+                    <input type="text" id="new-rank-name" placeholder="Nombre de rango" style="width: 100%; margin-bottom: 8px;" />
+                    <input type="number" id="new-rank-tax" placeholder="Impuesto %" min="0" max="100" style="width: 100%; margin-bottom: 8px;" />
+                    <input type="text" id="new-rank-perms" placeholder="Permisos (coma separados)" style="width: 100%; margin-bottom: 8px;" />
+                    <button type="button" onclick="addRank()">Agregar rango</button>
+                </div>
                 <div class="table-container">
                     <table>
                         <thead>
