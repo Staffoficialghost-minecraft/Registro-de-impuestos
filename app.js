@@ -37,6 +37,8 @@ const defaults = [
   { name: "Miembro", taxPercent: 10, perms: ["ver_tabla_impuestos"] }
 ];
 
+const ALL_PERMS = ["ver_tabla_impuestos","editar_tabla","editar_dinero","ver_jugadores","verificar_cuentas","cambiar_rangos","marcar_pago","agregar_notas","responder_mensajes","cerrar_semana","gestionar_rangos"];
+
 // ==========================
 // Funciones auxiliares
 // ==========================
@@ -139,14 +141,24 @@ window.updateWeekStatusUI = () => {
 window.renderRanks = () => {
   const tbody = document.getElementById('tbody-ranks');
   if(!tbody) return;
-  tbody.innerHTML = ''; 
+  tbody.innerHTML = '';
+  const canEditRanks = hasPerm('cambiar_rangos');
   (state.ranks||[]).sort((a,b)=>a.order - b.order).forEach(r=>{
     const tr = document.createElement('tr');
+    const currentPerms = new Set(r.permissions || []);
+    const options = ALL_PERMS.map(p => `
+      <option value="${p}" ${currentPerms.has(p) ? 'selected' : ''}>${p}</option>
+    `).join('');
+
     tr.innerHTML = `
       <td>${r.name}</td>
-      <td><input type="number" min="0" max="100" id="rank-tax-${r.id}" value="${r.taxPercent || 0}" style="width:80px" /></td>
-      <td><input type="text" id="rank-perm-${r.id}" value="${(r.permissions||[]).join(',')}" style="width:180px" /></td>
-      <td><button onclick="saveRank('${r.id}')">Guardar</button></td>
+      <td><input type="number" min="0" max="100" id="rank-tax-${r.id}" value="${r.taxPercent || 0}" style="width:80px" ${canEditRanks ? '' : 'disabled'} /></td>
+      <td>
+        <select id="rank-perm-${r.id}" multiple size="4" style="width:220px;" ${canEditRanks ? '' : 'disabled'}>
+          ${options}
+        </select>
+      </td>
+      <td><button onclick="saveRank('${r.id}')" ${canEditRanks ? '' : 'disabled'}>${canEditRanks ? 'Guardar' : 'No permitido'}</button></td>
     `;
     tbody.appendChild(tr);
   });
@@ -249,11 +261,11 @@ window.closeWeek = async () => {
 
 window.saveRank = async rankId => {
   const taxInput = document.getElementById(`rank-tax-${rankId}`);
-  const permInput = document.getElementById(`rank-perm-${rankId}`);
-  if(!taxInput || !permInput) return;
+  const permSelect = document.getElementById(`rank-perm-${rankId}`);
+  if(!taxInput || !permSelect) return;
 
   const taxPercent = parseFloat(taxInput.value) || 0;
-  const perms = permInput.value.split(',').map(s=>s.trim()).filter(Boolean);
+  const perms = Array.from(permSelect.selectedOptions).map(o=>o.value).filter(Boolean);
 
   await updateDoc(doc(db,'ranks',rankId), {
     taxPercent,
@@ -267,7 +279,8 @@ window.saveRank = async rankId => {
 window.addRank = async () => {
   const name = document.getElementById('new-rank-name')?.value.trim();
   const tax = parseFloat(document.getElementById('new-rank-tax')?.value) || 0;
-  const perms = document.getElementById('new-rank-perms')?.value.split(',').map(s=>s.trim()).filter(Boolean);
+  const permSelect = document.getElementById('new-rank-perms');
+  const perms = Array.from(permSelect?.selectedOptions || []).map(o=>o.value).filter(Boolean);
   if(!name || !state.dbUser?.clanId) return toast('Faltan campos', 'error');
 
   await addDoc(collection(db,'ranks'), {
