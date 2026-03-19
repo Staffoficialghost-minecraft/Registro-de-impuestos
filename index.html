@@ -111,6 +111,16 @@ body { background: #050811; color: #dbe9ff; }
 
             <div id="p-users" class="panel hidden">
                 <h2>Gestión de Usuarios</h2>
+                <div class="card" style="margin-bottom:12px; background: rgba(16, 27, 43, 0.88); border:1px solid rgba(93,129,197,0.5);">
+                    <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                      <input type="checkbox" id="filter-unverified" onchange="updateUserFilter()" />
+                      Solo sin verificar
+                    </label>
+                    <label style="display:flex; flex-direction:column; gap:4px;">
+                      Filtrar por rangos (Ctrl/Cmd+clic para múltiples):
+                      <select id="filter-ranks" multiple size="4" onchange="updateUserFilter()" style="width:100%;"></select>
+                    </label>
+                </div>
                 <div class="table-container">
                     <table>
                         <thead>
