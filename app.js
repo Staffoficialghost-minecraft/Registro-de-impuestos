@@ -27,7 +27,7 @@ const db = getFirestore(app);
 // ==========================
 // Estado global
 // ==========================
-const state = { authUser: null, dbUser: null, clan: null, ranks: [] };
+const state = { authUser: null, dbUser: null, clan: null, ranks: [], userFilter: { onlyUnverified: false, rankIds: [] } };
 
 const defaults = [
   { name: "Lider Fundador", taxPercent: 0, perms: ["ver_tabla_impuestos","editar_tabla","editar_dinero","ver_jugadores","verificar_cuentas","cambiar_rangos","marcar_pago","agregar_notas","responder_mensajes","cerrar_semana","gestionar_rangos"] },
@@ -76,19 +76,59 @@ window.showPanel = id => {
   document.querySelector(`#dash-nav button[onclick="showPanel('${id}')"]`)?.classList.add('active');
 };
 
+window.updateUserFilter = () => {
+  const checkbox = document.getElementById('filter-unverified');
+  const select = document.getElementById('filter-ranks');
+  if(checkbox) state.userFilter.onlyUnverified = checkbox.checked;
+  if(select) state.userFilter.rankIds = Array.from(select.selectedOptions).map(o=>o.value).filter(Boolean);
+  renderUsers();
+};
+
 window.renderUsers = () => {
   const tbody = document.getElementById('tbody-users');
   if(!tbody) return;
   tbody.innerHTML = '';
+  const canManageRanks = hasPerm('cambiar_rangos') || hasPerm('gestionar_rangos');
   const users = (state.users||[]).sort((a,b)=>a.nametag.localeCompare(b.nametag));
-  users.forEach(u => {
+
+  const rankFilter = document.getElementById('filter-ranks');
+  if(rankFilter){
+    const selectedRankIds = new Set(state.userFilter.rankIds || []);
+    rankFilter.innerHTML = state.ranks.map(r => `<option value="${r.id}" ${selectedRankIds.has(r.id) ? 'selected' : ''}>${r.name}</option>`).join('');
+  }
+
+  let filteredUsers = users;
+  if(state.userFilter.onlyUnverified){
+    filteredUsers = filteredUsers.filter(u => !u.verified);
+  }
+  if(state.userFilter.rankIds?.length){
+    filteredUsers = filteredUsers.filter(u => state.userFilter.rankIds.includes(u.rankId));
+  }
+
+  filteredUsers.forEach(u => {
     const rank = state.ranks.find(r=>r.id===u.rankId);
+
+    let rankCell = rank?.name || 'Sin rango';
+    if(canManageRanks) {
+      const options = state.ranks.map(r => `<option value="${r.id}" ${r.id===u.rankId ? 'selected' : ''}>${r.name}</option>`).join('');
+      rankCell = `
+        <div style="display:flex; gap:6px; align-items:center;">
+          <select id="rank-select-${u.id}" style="min-width:120px;">${options}</select>
+          <button onclick="assignRankToUser('${u.id}')" style="padding:2px 8px;">Guardar</button>
+        </div>
+      `;
+    }
+
+    const verifiedAction = hasPerm('verificar_cuentas') && !u.verified
+      ? `<button onclick="toggleUserVerification('${u.id}', ${u.verified})">Verificar</button>`
+      : '-';
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${u.nametag || '(sin nametag)'}</td>
-      <td>${rank?.name || 'Sin rango'}</td>
+      <td>${rankCell}</td>
       <td>${u.verified ? 'Verificado' : 'Pendiente'}</td>
-      <td>${hasPerm('verificar_cuentas') && !u.verified ? `<button onclick="toggleUserVerification('${u.id}', ${u.verified})">Verificar</button>` : '-'}</td>
+      <td>${verifiedAction}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -257,6 +297,26 @@ window.toggleUserVerification = async (userId, verified) => {
   if(!hasPerm('verificar_cuentas')) return toast('Sin permisos', 'error');
   await setDoc(doc(db,'users',userId), { verified: !verified }, { merge: true });
   toast(`Usuario ${!verified ? 'verificado' : 'marcado como no verificado'}`);
+  await loadDashboardData();
+};
+
+window.assignRankToUser = async userId => {
+  if(!hasPerm('cambiar_rangos') && !hasPerm('gestionar_rangos')) return toast('Sin permisos para asignar rangos', 'error');
+  const select = document.getElementById(`rank-select-${userId}`);
+  if(!select) return toast('Selector de rango no encontrado', 'error');
+  const newRankId = select.value || null;
+  const targetRank = state.ranks.find(r=>r.id===newRankId);
+  const user = state.users.find(u=>u.id===userId);
+  const currentRank = state.ranks.find(r=>r.id===user?.rankId);
+
+  const grantsManage = targetRank?.permissions?.includes('gestionar_rangos');
+  const hadManage = currentRank?.permissions?.includes('gestionar_rangos');
+  if(grantsManage && !hadManage){
+    if(!confirm('Estás a punto de otorgar permiso "gestionar_rangos" a este usuario. ¿Seguro?')) return toast('Asignación cancelada', 'error');
+  }
+
+  await updateDoc(doc(db,'users',userId), { rankId: newRankId });
+  toast('Rango asignado');
   await loadDashboardData();
 };
 
