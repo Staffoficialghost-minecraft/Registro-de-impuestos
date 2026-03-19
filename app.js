@@ -370,15 +370,16 @@ const updateDashboardUI = () => {
     return;
   }
 
+  const clanName = state.clan?.name || state.dbUser?.clanId || 'Desconocido';
   if(state.dbUser.verified){
     unverifiedDiv?.classList.add('hidden');
     dashLayout?.classList.remove('hidden');
-    infoDisplay && (infoDisplay.innerText = `Nametag: ${state.dbUser.nametag || ''} - Clan: ${state.dbUser.clanId || ''}`);
+    infoDisplay && (infoDisplay.innerText = `Nametag: ${state.dbUser.nametag || ''} - Clan: ${clanName}`);
     showPanel('p-taxes');
   } else {
     unverifiedDiv?.classList.remove('hidden');
     dashLayout?.classList.add('hidden');
-    infoDisplay && (infoDisplay.innerText = `Nametag: ${state.dbUser.nametag || ''} - Clan: ${state.dbUser.clanId || ''}`);
+    infoDisplay && (infoDisplay.innerText = `Nametag: ${state.dbUser.nametag || ''} - Clan: ${clanName}`);
   }
 };
 
