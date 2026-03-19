@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clan Manager</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clan Manager</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- MENÚ PRINCIPAL -->
+    <!-- HOME -->
     <div id="v-home" class="view">
         <div class="card">
             <h1>Clan Manager</h1>
-            <button onclick="nav('v-create')">Crear Clan</button>
-            <button onclick="nav('v-register')">Registrarse</button>
-            <button onclick="nav('v-login')">Login</button>
+            <div class="home-buttons">
+                <button onclick="nav('v-create')">Crear Clan</button>
+                <button onclick="nav('v-register')">Registrarse</button>
+                <button onclick="nav('v-login')">Login</button>
+            </div>
         </div>
     </div>
 
@@ -30,11 +32,11 @@
         </div>
     </div>
 
-    <!-- REGISTRARSE / UNIRSE A CLAN -->
+    <!-- REGISTRARSE -->
     <div id="v-register" class="view hidden">
         <div class="card">
             <h2>Registrarse</h2>
-            <input type="text" id="j-invite-id" placeholder="Código de Clan">
+            <input type="text" id="j-invite-id" placeholder="Código del Clan">
             <input type="text" id="j-nametag" placeholder="Tu Nametag">
             <input type="password" id="j-password" placeholder="Contraseña">
             <button onclick="joinClan()">Registrarse</button>
@@ -61,314 +63,6 @@
             <p>Tu cuenta está pendiente de verificación por un administrador.</p>
             <button onclick="logout()">Cerrar Sesión</button>
         </div>
-
-        <div id="dash-layout" class="hidden">
-            <aside>
-                <h3>Panel</h3>
-                <p id="user-info-display"></p>
-                <nav id="dash-nav">
-                    <button onclick="showPanel('p-taxes')">Impuestos</button>
-                    <button onclick="showPanel('p-users')">Usuarios</button>
-                    <button onclick="showPanel('p-ranks')">Rangos</button>
-                    <button onclick="showPanel('p-messages')">Mensajes</button>
-                </nav>
-                <button onclick="logout()" class="secondary">Cerrar Sesión</button>
-            </aside>
-            <main>
-                <div id="p-taxes" class="panel hidden">
-                    <h2>Tabla de Impuestos (Semana <span id="week-display"></span>)</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Jugador</th>
-                                    <th>Rango</th>
-                                    <th>Dinero</th>
-                                    <th>Impuesto %</th>
-                                    <th>A pagar</th>
-                                    <th>Estado</th>
-                                    <th>Nota</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-taxes"></tbody>
-                        </table>
-                    </div>
-                    <h3>Semanas Anteriores</h3>
-                    <div id="history-weeks"></div>
-                </div>
-
-                <div id="p-users" class="panel hidden">
-                    <h2>Gestión de Usuarios</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nametag</th>
-                                    <th>Rango</th>
-                                    <th>Estado</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-users"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div id="p-ranks" class="panel hidden">
-                    <h2>Gestión de Rangos</h2>
-                    <div id="rank-form-container" class="hidden">
-                        <input type="text" id="r-name" placeholder="Nombre del Rango">
-                        <input type="number" id="r-tax" placeholder="Impuesto %">
-                        <input type="text" id="r-perms" placeholder="Permisos (separados por coma)">
-                        <button onclick="saveRank()">Guardar Rango</button>
-                    </div>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Impuesto %</th>
-                                    <th>Permisos</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-ranks"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div id="p-messages" class="panel hidden">
-                    <h2>Mensajes</h2>
-                    <div id="send-msg-container">
-                        <input type="text" id="m-text" placeholder="Escribir mensaje a líderes...">
-                        <button onclick="sendMessage()">Enviar</button>
-                    </div>
-                    <div id="messages-list"></div>
-                </div>
-            </main>
-        </div>
-    </div>
-
-    <!-- Toasts -->
-    <div id="toast-container"></div>
-
-    <script type="module" src="app.js"></script>
-</body>
-</html>            <input type="password" id="j-password" placeholder="Contraseña">
-            <button onclick="joinClan()">Unirse</button>
-            <button onclick="nav('v-home')" class="secondary">Volver</button>
-        </div>
-    </div>
-
-    <div id="v-login" class="view hidden">
-        <div class="card">
-            <h2>Login</h2>
-            <input type="text" id="l-nametag" placeholder="Tu Nametag">
-            <input type="text" id="l-clan" placeholder="Nombre del Clan">
-            <input type="password" id="l-password" placeholder="Contraseña">
-            <button onclick="login()">Ingresar</button>
-            <button onclick="nav('v-home')" class="secondary">Volver</button>
-        </div>
-    </div>
-
-    <div id="v-dashboard" class="view hidden">
-        <div id="unverified-msg" class="hidden card">
-            <h2>Cuenta Pendiente</h2>
-            <p>Tu cuenta está pendiente de verificación por un administrador.</p>
-            <button onclick="logout()">Cerrar Sesión</button>
-        </div>
-        <div id="dash-layout" class="hidden dashboard">
-            <aside>
-                <h3>Panel</h3>
-                <p id="user-info-display"></p>
-                <nav id="dash-nav">
-                    <button onclick="showPanel('p-taxes')">Impuestos</button>
-                    <button onclick="showPanel('p-users')">Usuarios</button>
-                    <button onclick="showPanel('p-ranks')">Rangos</button>
-                    <button onclick="showPanel('p-messages')">Mensajes</button>
-                </nav>
-                <button onclick="logout()" class="secondary">Cerrar Sesión</button>
-            </aside>
-            <main>
-                <!-- Panels -->
-                <div id="p-taxes" class="panel hidden">
-                    <h2>Tabla de Impuestos (Semana <span id="week-display"></span>)</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Jugador</th>
-                                    <th>Rango</th>
-                                    <th>Dinero</th>
-                                    <th>%</th>
-                                    <th>A pagar</th>
-                                    <th>Estado</th>
-                                    <th>Nota</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-taxes"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div id="p-users" class="panel hidden">
-                    <h2>Gestión de Usuarios</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nametag</th>
-                                    <th>Rango</th>
-                                    <th>Estado</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-users"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div id="p-ranks" class="panel hidden">
-                    <h2>Gestión de Rangos</h2>
-                    <input type="text" id="r-name" placeholder="Nombre del Rango">
-                    <input type="number" id="r-tax" placeholder="Impuesto %">
-                    <input type="text" id="r-perms" placeholder="Permisos (separados por coma)">
-                    <button onclick="saveRank()">Guardar Rango</button>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Impuesto %</th>
-                                    <th>Permisos</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-ranks"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div id="p-messages" class="panel hidden">
-                    <h2>Mensajes</h2>
-                    <input type="text" id="m-text" placeholder="Escribir mensaje...">
-                    <button onclick="sendMessage()">Enviar</button>
-                    <div id="messages-list"></div>
-                </div>
-            </main>
-        </div>
-    </div>
-
-    <!-- Toasts -->
-    <div id="toast-container"></div>
-
-    <script type="module" src="firebase.js"></script>
-    <script type="module" src="app.js"></script>
-</body>
-</html>>Jugador</th>
-                                    <th>Rango</th>
-                                    <th>Dinero</th>
-                                    <th>Impuesto %</th>
-                                    <th>A pagar</th>
-                                    <th>Estado</th>
-                                    <th>Nota</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-taxes"></tbody>
-                        </table>
-                    </div>
-                    <h3>Semanas Anteriores</h3>
-                    <div id="history-weeks"></div>
-                </div>
-
-                <!-- USUARIOS -->
-                <div id="p-users" class="panel hidden">
-                    <h2>Gestión de Usuarios</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nametag</th>
-                                    <th>Rango</th>
-                                    <th>Estado</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-users"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- RANGOS -->
-                <div id="p-ranks" class="panel hidden">
-                    <h2>Gestión de Rangos</h2>
-                    <div id="rank-form-container">
-                        <input type="text" id="r-name" placeholder="Nombre del Rango">
-                        <input type="number" id="r-tax" placeholder="Impuesto %">
-                        <input type="text" id="r-perms" placeholder="Permisos (separados por coma)">
-                        <button onclick="saveRank()">Guardar Rango</button>
-                    </div>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Impuesto %</th>
-                                    <th>Permisos</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-ranks"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- MENSAJES -->
-                <div id="p-messages" class="panel hidden">
-                    <h2>Mensajes</h2>
-                    <div id="send-msg-container">
-                        <input type="text" id="m-text" placeholder="Escribir mensaje a líderes...">
-                        <button onclick="sendMessage()">Enviar</button>
-                    </div>
-                    <div id="messages-list"></div>
-                </div>
-            </main>
-        </div>
-    </div>
-
-    <!-- TOASTS -->
-    <div id="toast-container"></div>
-
-    <!-- SCRIPTS -->
-    <script type="module" src="firebase.js"></script>
-    <script type="module" src="app.js"></script>
-
-</body>
-</html>            <button onclick="joinClan()">Unirse</button>
-            <button onclick="nav('v-home')" class="secondary">Volver</button>
-        </div>
-    </div>
-
-    <div id="v-login" class="view hidden">
-        <div class="card">
-            <h2>Login</h2>
-            <input type="text" id="l-nametag" placeholder="Tu Nametag">
-            <input type="text" id="l-clan" placeholder="Nombre del Clan">
-            <input type="password" id="l-password" placeholder="Contraseña">
-            <button onclick="login()">Ingresar</button>
-            <button onclick="nav('v-home')" class="secondary">Volver</button>
-        </div>
-    </div>
-
-    <div id="v-dashboard" class="view hidden">
-        <div id="unverified-msg" class="hidden card">
-            <h2>Cuenta Pendiente</h2>
-            <p>Tu cuenta está pendiente de verificación por un administrador.</p>
-            <button onclick="logout()">Cerrar Sesión</button>
-        </div>
         
         <div id="dash-layout" class="hidden">
             <aside>
@@ -383,7 +77,7 @@
                 <button onclick="logout()" class="secondary">Cerrar Sesión</button>
             </aside>
             <main>
-                <div id="p-taxes" class="panel">
+                <div id="p-taxes" class="panel hidden">
                     <h2>Tabla de Impuestos (Semana <span id="week-display"></span>)</h2>
                     <button id="btn-close-week" class="hidden" onclick="closeWeek()">Cerrar Semana</button>
                     <div class="table-container">
@@ -459,8 +153,10 @@
         </div>
     </div>
 
+    <!-- TOASTS -->
     <div id="toast-container"></div>
 
+    <!-- JS -->
     <script type="module" src="app.js"></script>
 </body>
-                      </html>
+</html>
