@@ -4,80 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clan Manager</title>
-<style>
-/* ======================= */
-/* Estilos generales       */
-/* ======================= */
-body {
-    font-family: 'Poppins', Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: radial-gradient(circle at top, #0e1a2a 0%, #03070f 54%, #02030a 100%);
-    color: #e7edf5;
-    display: flex;
-    justify-content: center;
-    min-height: 100vh;
-    background-attachment: fixed;
-    overflow-x: hidden;
-}
-.view {
-    display: none;
-    width: 100%;
-    max-width: 540px;
-    padding: 20px;
-    box-sizing: border-box;
-}
-.view:not(.hidden) { display: block; }
-.card {
-    background: rgba(12, 21, 36, 0.92);
-    border: 1px solid rgba(101, 128, 255, 0.35);
-    padding: 20px;
-    border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
-    margin-bottom: 20px;
-}
-.card h1, .card h2 {
-    margin-top: 0;
-    margin-bottom: 16px;
-    text-align: center;
-    color: #d6e6ff;
-    text-shadow: 0 0 14px rgba(110, 146, 255, 0.4);
-}
-input[type="text"], input[type="password"], input[type="number"] {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(125, 146, 185, 0.7);
-    background: rgba(8, 17, 34, 0.8);
-    color: #e6efff;
-    box-sizing: border-box;
-}
-input::placeholder {
-    color: #a4b4d7;
-}
-button {
-    width: 100%;
-    padding: 11px;
-    margin-top: 8px;
-    border: none;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #4f46e5, #6a7cfd);
-    color: #fff;
-    font-size: 16px;
-    cursor: pointer;
-    transition: transform 0.2s ease, filter 0.2s ease;
-}
-button:hover {
-    filter: brightness(1.15);
-    transform: translateY(-1px);
-}
-button.secondary {
-    background: linear-gradient(135deg, rgba(100, 116, 139, 0.7), rgba(58, 65, 82, 0.7));
-}
-.hidden { display: none; }
+<link rel="stylesheet" href="style.css">
 
-/* ======================= */
+<style>
+/* Fallback local cuando no carga style.css */
+body { background: #050811; color: #dbe9ff; }
+</style>
 /* Dashboard               */
 /* ======================= */
 #dash-layout {
