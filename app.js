@@ -1,5 +1,5 @@
 // ==========================
-// firebase + app.js unido
+// firebase + app.js unificado
 // ==========================
 
 // Importar Firebase desde CDN
@@ -7,7 +7,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+// ==========================
 // Configuración de Firebase
+// ==========================
 const firebaseConfig = {
   apiKey: "AIzaSyAepHgklQpdti_LjOOVEAJ2nEt6BvgTs_M",
   authDomain: "ghost-136da.firebaseapp.com",
@@ -18,7 +20,6 @@ const firebaseConfig = {
   measurementId: "G-93ZSR3TXYJ"
 };
 
-// Inicializa Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -39,21 +40,21 @@ const defaults = [
 // ==========================
 // Funciones auxiliares
 // ==========================
-const gId = id => document.getElementById(id).value.trim();
+const gId = id => document.getElementById(id)?.value.trim() || "";
 const mkEmail = (n,c) => `${n.replace(/\s+/g,'_')}@${c.replace(/\s+/g,'_')}.com`.toLowerCase();
 
 window.toast = (msg,type='success') => {
   const container = document.getElementById('toast-container');
-  if(!container) return alert(msg);
+  if(!container){ console.log(msg); return alert(msg); }
   const t = document.createElement('div');
   t.className = `toast ${type}`;
   t.innerText = msg;
   container.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
+  setTimeout(()=>t.remove(),3000);
 };
 
 const hasPerm = p => {
-  if(!state.dbUser||!state.dbUser.rankId) return false;
+  if(!state.dbUser || !state.dbUser.rankId) return false;
   const r = state.ranks.find(r=>r.id===state.dbUser.rankId);
   return r ? r.permissions.includes(p) : false;
 };
@@ -63,12 +64,12 @@ const hasPerm = p => {
 // ==========================
 window.nav = id => {
   document.querySelectorAll('.view').forEach(e => e.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
+  document.getElementById(id)?.classList.remove('hidden');
 };
 
 window.showPanel = id => {
-  document.querySelectorAll('.panel').forEach(e=>e.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
+  document.querySelectorAll('.panel').forEach(e => e.classList.add('hidden'));
+  document.getElementById(id)?.classList.remove('hidden');
 };
 
 // ==========================
@@ -78,11 +79,10 @@ window.createClan = async () => {
   const name = gId('c-clan-name'), inv = gId('c-invite-id'), nt = gId('c-nametag'), pass = gId('c-password');
   if(!name||!inv||!nt||!pass) return toast("Faltan datos","error");
 
-  const q = query(collection(db,"clans"), where("inviteId","==",inv));
-  const snap = await getDocs(q);
-  if(!snap.empty) return toast("ID de invitación en uso","error");
-
   try {
+    const snap = await getDocs(query(collection(db,"clans"), where("inviteId","==",inv)));
+    if(!snap.empty) return toast("ID de invitación en uso","error");
+
     const clanRef = await addDoc(collection(db,"clans"), { name, inviteId: inv, createdAt: Date.now() });
     let founderRankId = "";
     for(let i=0;i<defaults.length;i++){
@@ -90,31 +90,40 @@ window.createClan = async () => {
       if(i===0) founderRankId = rRef.id;
     }
     await addDoc(collection(db,"weeks"), { clanId: clanRef.id, weekId:1, closed:false });
+
     const email = mkEmail(nt,name);
     const { user } = await createUserWithEmailAndPassword(auth,email,pass);
     await setDoc(doc(db,"users",user.uid), { uid:user.uid, nametag:nt, clanId:clanRef.id, rankId:founderRankId, verified:true, email, createdAt:Date.now() });
+
     toast("Clan creado y usuario registrado");
-  } catch(e) { toast(e.message,"error"); }
+  } catch(e) {
+    console.error(e);
+    toast(e.message || "Error al crear clan","error");
+  }
 };
 
 window.joinClan = async () => {
   const inv = gId('j-invite-id'), nt = gId('j-nametag'), pass = gId('j-password');
   if(!inv||!nt||!pass) return toast("Faltan datos","error");
 
-  const q = query(collection(db,"clans"), where("inviteId","==",inv));
-  const snap = await getDocs(q);
-  if(snap.empty) return toast("Invitación inválida","error");
-
-  const clanDoc = snap.docs[0], clanId = clanDoc.id, clanName = clanDoc.data().name;
-  const email = mkEmail(nt,clanName);
-
   try {
+    const snap = await getDocs(query(collection(db,"clans"), where("inviteId","==",inv)));
+    if(snap.empty) return toast("Invitación inválida","error");
+
+    const clanDoc = snap.docs[0], clanId = clanDoc.id, clanName = clanDoc.data().name;
+    const email = mkEmail(nt,clanName);
+
     const rSnap = await getDocs(query(collection(db,"ranks"), where("clanId","==",clanId), where("name","==","Miembro")));
     const defaultRankId = rSnap.empty ? null : rSnap.docs[0].id;
+
     const { user } = await createUserWithEmailAndPassword(auth,email,pass);
     await setDoc(doc(db,"users",user.uid), { uid:user.uid, nametag:nt, clanId, rankId:defaultRankId, verified:false, email, createdAt:Date.now() });
+
     toast("Cuenta creada, esperando verificación");
-  } catch(e) { toast(e.code==='auth/email-already-in-use' ? "El Nametag ya existe" : "Error al registrar","error"); }
+  } catch(e) {
+    console.error(e);
+    toast(e.code==='auth/email-already-in-use' ? "El Nametag ya existe" : "Error al registrar","error");
+  }
 };
 
 window.login = async () => {
@@ -123,7 +132,10 @@ window.login = async () => {
 
   try {
     await signInWithEmailAndPassword(auth, mkEmail(nt,clan), pass);
-  } catch(e) { toast("Credenciales inválidas","error"); }
+  } catch(e) {
+    console.error(e);
+    toast("Credenciales inválidas","error");
+  }
 };
 
 window.logout = () => signOut(auth);
@@ -134,8 +146,13 @@ window.logout = () => signOut(auth);
 onAuthStateChanged(auth, async u => {
   if(!u){ state.authUser=null; state.dbUser=null; return nav('v-home'); }
   state.authUser = u;
-  const userSnap = await getDoc(doc(db,"users",u.uid));
-  if(!userSnap.exists()) return logout();
-  state.dbUser = userSnap.data();
-  nav('v-dashboard');
+  try {
+    const userSnap = await getDoc(doc(db,"users",u.uid));
+    if(!userSnap.exists()) return logout();
+    state.dbUser = userSnap.data();
+    nav('v-dashboard');
+  } catch(e){
+    console.error(e);
+    logout();
+  }
 });
