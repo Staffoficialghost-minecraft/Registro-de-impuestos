@@ -19,8 +19,8 @@
 }
 
 body {
-    background: var(--secondary-bg);
-    color: var(--text);
+    background: radial-gradient(circle at top, #050811 0%, #070d20 40%, #01040a 100%);
+    color: #dbe9ff;
     min-height: 100vh;
 }
 
@@ -38,10 +38,11 @@ body {
 
 /* Cards */
 .card {
-    background: var(--surface);
+    background: rgba(16, 27, 43, 0.93);
+    border: 1px solid rgba(90, 126, 209, 0.42);
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.45);
     max-width: 400px;
     width: 100%;
     text-align: center;
@@ -49,7 +50,7 @@ body {
 
 .card h1, .card h2 {
     margin-bottom: 20px;
-    color: var(--primary);
+    color: #b8d2ff;
 }
 
 /* Inputs */
@@ -59,27 +60,35 @@ input[type="number"] {
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
-    border: 1px solid #d1d5db;
+    border: 1px solid rgba(122, 152, 221, 0.5);
     border-radius: 6px;
     font-size: 16px;
+    background: rgba(10, 20, 36, 0.85);
+    color: #e4edff;
+}
+
+input::placeholder {
+    color: #9db1de;
 }
 
 /* Botones */
 button {
-    background: var(--primary);
-    color: #fff;
-    border: none;
+    background: linear-gradient(135deg, #5672fd, #2f45c8);
+    color: #eff5ff;
+    border: 1px solid rgba(148, 174, 255, 0.5);
     padding: 12px 20px;
     margin-top: 10px;
     border-radius: 6px;
     cursor: pointer;
     font-size: 16px;
     width: 100%;
-    transition: background 0.2s;
+    box-shadow: 0 2px 10px rgba(47, 70, 161, 0.45);
+    transition: transform 0.2s ease, filter 0.2s ease;
 }
 
 button:hover {
-    background: #4338ca;
+    filter: brightness(1.15);
+    transform: translateY(-1px);
 }
 
 button.secondary {
