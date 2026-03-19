@@ -1,148 +1,257 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clan Manager</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clan Manager</title>
+<style>
+/* ======================= */
+/* Estilos generales       */
+/* ======================= */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+.view {
+    display: none;
+    width: 100%;
+    max-width: 480px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.view:not(.hidden) { display: block; }
+.card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+.card h1, .card h2 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    text-align: center;
+}
+input[type="text"], input[type="password"], input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 6px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+button.secondary {
+    background-color: #6c757d;
+}
+button:hover { opacity: 0.9; }
+.hidden { display: none; }
+
+/* ======================= */
+/* Dashboard               */
+/* ======================= */
+#dash-layout {
+    display: flex;
+    flex-direction: column;
+}
+aside {
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+aside nav button {
+    margin-bottom: 8px;
+    width: 100%;
+}
+main .panel {
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+.table-container {
+    overflow-x: auto;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+#toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+.toast {
+    background: #28a745;
+    color: #fff;
+    padding: 10px 20px;
+    margin-top: 10px;
+    border-radius: 8px;
+    min-width: 200px;
+    text-align: center;
+}
+.toast.error { background: #dc3545; }
+</style>
 </head>
 <body>
-    <!-- ====== Vistas ====== -->
-    <div id="v-home" class="view">
-        <div class="card center-card">
-            <h1>Clan Manager</h1>
-            <div class="btn-group">
-                <button onclick="nav('v-create')">Crear Clan</button>
-                <button onclick="nav('v-join')">Unirse con invitación</button>
-                <button onclick="nav('v-login')">Login</button>
+
+<!-- ======================= -->
+<!-- Vistas principales      -->
+<!-- ======================= -->
+
+<div id="v-home" class="view">
+    <div class="card">
+        <h1>Clan Manager</h1>
+        <button type="button" onclick="nav('v-create')">Crear Clan</button>
+        <button type="button" onclick="nav('v-join')">Unirse con Código</button>
+        <button type="button" onclick="nav('v-login')">Login</button>
+    </div>
+</div>
+
+<div id="v-create" class="view hidden">
+    <div class="card">
+        <h2>Crear Clan</h2>
+        <input type="text" id="c-clan-name" placeholder="Nombre del Clan">
+        <input type="text" id="c-invite-id" placeholder="Código de Invitación (único)">
+        <input type="text" id="c-nametag" placeholder="Tu Nametag">
+        <input type="password" id="c-password" placeholder="Contraseña">
+        <button type="button" onclick="createClan()">Crear y Entrar</button>
+        <button type="button" onclick="nav('v-home')" class="secondary">Volver</button>
+    </div>
+</div>
+
+<div id="v-join" class="view hidden">
+    <div class="card">
+        <h2>Unirse a un Clan</h2>
+        <input type="text" id="j-invite-id" placeholder="Código de Invitación">
+        <input type="text" id="j-nametag" placeholder="Tu Nametag">
+        <input type="password" id="j-password" placeholder="Contraseña">
+        <button type="button" onclick="joinClan()">Unirse</button>
+        <button type="button" onclick="nav('v-home')" class="secondary">Volver</button>
+    </div>
+</div>
+
+<div id="v-login" class="view hidden">
+    <div class="card">
+        <h2>Login</h2>
+        <input type="text" id="l-nametag" placeholder="Tu Nametag">
+        <input type="text" id="l-clan" placeholder="Nombre del Clan">
+        <input type="password" id="l-password" placeholder="Contraseña">
+        <button type="button" onclick="login()">Ingresar</button>
+        <button type="button" onclick="nav('v-home')" class="secondary">Volver</button>
+    </div>
+</div>
+
+<div id="v-dashboard" class="view hidden">
+    <div class="card" id="unverified-msg" class="hidden">
+        <h2>Cuenta Pendiente</h2>
+        <p>Tu cuenta está pendiente de verificación por un administrador.</p>
+        <button type="button" onclick="logout()">Cerrar Sesión</button>
+    </div>
+
+    <div id="dash-layout" class="hidden">
+        <aside>
+            <h3>Panel</h3>
+            <p id="user-info-display"></p>
+            <nav id="dash-nav">
+                <button type="button" onclick="showPanel('p-taxes')">Impuestos</button>
+                <button type="button" onclick="showPanel('p-users')">Usuarios</button>
+                <button type="button" onclick="showPanel('p-ranks')">Rangos</button>
+                <button type="button" onclick="showPanel('p-messages')">Mensajes</button>
+            </nav>
+            <button type="button" onclick="logout()" class="secondary">Cerrar Sesión</button>
+        </aside>
+        <main>
+            <div id="p-taxes" class="panel hidden">
+                <h2>Tabla de Impuestos</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Jugador</th>
+                                <th>Rango</th>
+                                <th>Dinero</th>
+                                <th>Impuesto %</th>
+                                <th>A pagar</th>
+                                <th>Estado</th>
+                                <th>Nota</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-taxes"></tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Crear Clan -->
-    <div id="v-create" class="view hidden">
-        <div class="card center-card">
-            <h2>Crear Clan</h2>
-            <input type="text" id="c-clan-name" placeholder="Nombre del Clan">
-            <input type="text" id="c-invite-id" placeholder="ID de Invitación (única)">
-            <input type="text" id="c-nametag" placeholder="Tu Nametag">
-            <input type="password" id="c-password" placeholder="Contraseña">
-            <button onclick="createClan()">Crear y Entrar</button>
-            <button onclick="nav('v-home')" class="secondary">Volver</button>
-        </div>
-    </div>
-
-    <!-- Unirse a Clan -->
-    <div id="v-join" class="view hidden">
-        <div class="card center-card">
-            <h2>Unirse a un Clan</h2>
-            <input type="text" id="j-invite-id" placeholder="ID de Invitación">
-            <input type="text" id="j-nametag" placeholder="Tu Nametag">
-            <input type="password" id="j-password" placeholder="Contraseña">
-            <button onclick="joinClan()">Unirse</button>
-            <button onclick="nav('v-home')" class="secondary">Volver</button>
-        </div>
-    </div>
-
-    <!-- Login -->
-    <div id="v-login" class="view hidden">
-        <div class="card center-card">
-            <h2>Login</h2>
-            <input type="text" id="l-nametag" placeholder="Tu Nametag">
-            <input type="text" id="l-clan" placeholder="Nombre del Clan">
-            <input type="password" id="l-password" placeholder="Contraseña">
-            <button onclick="login()">Ingresar</button>
-            <button onclick="nav('v-home')" class="secondary">Volver</button>
-        </div>
-    </div>
-
-    <!-- Dashboard -->
-    <div id="v-dashboard" class="view hidden">
-        <div id="unverified-msg" class="hidden card center-card">
-            <h2>Cuenta Pendiente</h2>
-            <p>Tu cuenta está pendiente de verificación por un administrador.</p>
-            <button onclick="logout()">Cerrar Sesión</button>
-        </div>
-        <div id="dash-layout" class="hidden">
-            <aside>
-                <h3>Panel</h3>
-                <p id="user-info-display"></p>
-                <nav id="dash-nav">
-                    <button onclick="showPanel('p-taxes')">Impuestos</button>
-                    <button onclick="showPanel('p-users')">Usuarios</button>
-                    <button onclick="showPanel('p-ranks')">Rangos</button>
-                    <button onclick="showPanel('p-messages')">Mensajes</button>
-                </nav>
-                <button onclick="logout()" class="secondary">Cerrar Sesión</button>
-            </aside>
-            <main>
-                <div id="p-taxes" class="panel hidden">
-                    <h2>Tabla de Impuestos</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Jugador</th>
-                                    <th>Rango</th>
-                                    <th>Dinero</th>
-                                    <th>Impuesto %</th>
-                                    <th>A pagar</th>
-                                    <th>Estado</th>
-                                    <th>Nota</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-taxes"></tbody>
-                        </table>
-                    </div>
+            <div id="p-users" class="panel hidden">
+                <h2>Gestión de Usuarios</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nametag</th>
+                                <th>Rango</th>
+                                <th>Estado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-users"></tbody>
+                    </table>
                 </div>
-                <div id="p-users" class="panel hidden">
-                    <h2>Gestión de Usuarios</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nametag</th>
-                                    <th>Rango</th>
-                                    <th>Estado</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-users"></tbody>
-                        </table>
-                    </div>
+            </div>
+
+            <div id="p-ranks" class="panel hidden">
+                <h2>Gestión de Rangos</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Impuesto %</th>
+                                <th>Permisos</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-ranks"></tbody>
+                    </table>
                 </div>
-                <div id="p-ranks" class="panel hidden">
-                    <h2>Gestión de Rangos</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Impuesto %</th>
-                                    <th>Permisos</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-ranks"></tbody>
-                        </table>
-                    </div>
-                </div>
-                <div id="p-messages" class="panel hidden">
-                    <h2>Mensajes</h2>
-                    <div id="send-msg-container">
-                        <input type="text" id="m-text" placeholder="Escribir mensaje a líderes...">
-                        <button onclick="sendMessage()">Enviar</button>
-                    </div>
-                    <div id="messages-list"></div>
-                </div>
-            </main>
-        </div>
+            </div>
+
+            <div id="p-messages" class="panel hidden">
+                <h2>Mensajes</h2>
+                <input type="text" id="m-text" placeholder="Escribir mensaje a líderes...">
+                <button type="button" onclick="sendMessage()">Enviar</button>
+                <div id="messages-list"></div>
+            </div>
+        </main>
     </div>
+</div>
 
-    <div id="toast-container"></div>
+<div id="toast-container"></div>
 
-    <!-- Script único -->
-    <script type="module" src="app.js"></script>
+<script type="module" src="app.js"></script>
 </body>
-                </html>
+            </html>
