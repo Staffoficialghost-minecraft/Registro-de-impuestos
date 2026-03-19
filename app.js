@@ -70,6 +70,8 @@ window.nav = id => {
 window.showPanel = id => {
   document.querySelectorAll('.panel').forEach(e => e.classList.add('hidden'));
   document.getElementById(id)?.classList.remove('hidden');
+  document.querySelectorAll('#dash-nav button').forEach(b => b.classList.remove('active'));
+  document.querySelector(`#dash-nav button[onclick="showPanel('${id}')"]`)?.classList.add('active');
 };
 
 window.renderUsers = () => {
