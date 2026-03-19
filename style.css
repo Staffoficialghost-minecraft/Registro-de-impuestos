@@ -1,122 +1,91 @@
-:root {
-    --bg: #121212;
-    --surface: #1e1e1e;
-    --primary: #bb86fc;
-    --text: #ffffff;
-    --text-sec: #b3b3b3;
-    --border: #333333;
-    --danger: #cf6679;
-    --success: #03dac6;
-}
+/* style.css */
 
-* {
-    box-sizing: border-box;
+/* Reset y body */
+body {
+    font-family: sans-serif;
     margin: 0;
     padding: 0;
-    font-family: sans-serif;
+    background: #f2f2f2;
 }
 
-body {
-    background-color: var(--bg);
-    color: var(--text);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
-
+/* Vistas */
 .view {
-    width: 100%;
-    max-width: 1200px;
-    padding: 20px;
+    display: block;
+    padding: 10px;
 }
 
 .hidden {
-    display: none !important;
+    display: none;
 }
 
+/* Tarjetas */
 .card {
-    background: var(--surface);
-    padding: 30px;
-    border-radius: 8px;
-    max-width: 400px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+    background: #fff;
+    padding: 15px;
+    margin: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
 }
 
-h1, h2, h3 {
-    text-align: center;
-    color: var(--primary);
-}
-
-input, select {
+/* Inputs */
+input {
+    width: 100%;
     padding: 10px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: var(--bg);
-    color: var(--text);
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
 }
 
+/* Botones */
 button {
-    padding: 10px;
-    background: var(--primary);
-    color: var(--bg);
+    padding: 10px 15px;
+    margin: 5px 0;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
+    background: #3498db;
+    color: #fff;
     cursor: pointer;
-    font-weight: bold;
-}
-
-button.secondary {
-    background: transparent;
-    border: 1px solid var(--primary);
-    color: var(--primary);
+    transition: 0.2s;
 }
 
 button:hover {
-    opacity: 0.8;
+    background: #2980b9;
 }
 
-#dash-layout {
+button.secondary {
+    background: #7f8c8d;
+}
+
+button.secondary:hover {
+    background: #606c73;
+}
+
+/* Dashboard */
+.dashboard {
     display: flex;
-    gap: 20px;
-    align-items: flex-start;
+    flex-direction: row;
+    gap: 10px;
+    padding: 10px;
 }
 
 aside {
-    background: var(--surface);
-    width: 250px;
-    padding: 20px;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-aside nav {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    flex: 1;
+    min-width: 120px;
+    padding: 10px;
+    background: #ecf0f1;
+    border-radius: 10px;
 }
 
 main {
-    flex: 1;
-    background: var(--surface);
-    padding: 20px;
-    border-radius: 8px;
+    flex: 2;
     overflow-x: auto;
 }
 
-.panel {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
+/* Table container para scroll horizontal */
 .table-container {
     overflow-x: auto;
+    margin-top: 10px;
 }
 
 table {
@@ -125,26 +94,30 @@ table {
 }
 
 th, td {
-    padding: 10px;
+    padding: 5px;
     text-align: left;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid #ddd;
 }
 
-th {
-    color: var(--primary);
+/* Paneles */
+.panel {
+    margin-top: 10px;
 }
 
-.msg-card {
-    background: var(--bg);
-    padding: 15px;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    border-left: 4px solid var(--primary);
+/* Responsive para móvil */
+@media (max-width: 600px) {
+    .dashboard {
+        flex-direction: column;
+    }
+    aside {
+        order: 2;
+    }
+    main {
+        order: 1;
+    }
 }
 
-.status-paid { color: var(--success); }
-.status-unpaid { color: var(--danger); }
-
+/* Toasts */
 #toast-container {
     position: fixed;
     bottom: 20px;
@@ -156,19 +129,30 @@ th {
 }
 
 .toast {
-    background: var(--surface);
-    color: var(--text);
-    padding: 15px 25px;
-    border-radius: 4px;
-    border-left: 4px solid var(--primary);
+    background: #fff;
+    color: #333;
+    padding: 10px 20px;
+    border-left: 4px solid #3498db;
+    border-radius: 5px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     animation: slideIn 0.3s ease-out forwards;
 }
 
-.toast.error { border-left-color: var(--danger); }
-.toast.success { border-left-color: var(--success); }
+.toast.success {
+    border-left-color: #3498db;
+}
+
+.toast.error {
+    border-left-color: #e74c3c;
+}
 
 @keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  }
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
